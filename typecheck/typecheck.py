@@ -233,7 +233,7 @@ class Checker:
 
         atyp = type(object)
         if primitive(atyp) and atyp != typ:
-            raise t.reason('invalid type, expecting {}'.format(typ))
+            raise t.reason('invalid type, expecting {} and recieved {}'.format(typ, atyp))
 
         if isinstance(typ, list):
             if atyp != list:
@@ -247,3 +247,27 @@ class Checker:
             if atyp != dict:
                 raise t.reason('expecting a dict')
             self._check_dict(typ, object, t)
+
+
+
+
+def check(**kwargs):
+    c = Checker(kwargs)
+
+    def decorator(f):
+        def wrapper(*args, **funkwargs):
+            try: 
+                if funkwargs:
+                    res = c.check(funkwargs)
+                else:
+                    if args:
+                        res = c.check(dict(zip(f.__code__.co_varnames, args)))
+            except:
+                raise
+            else:
+                return f(*args, **funkwargs)
+
+        return wrapper
+    return decorator
+
+
