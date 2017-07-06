@@ -245,4 +245,4 @@ class Checker:
                 raise t.reason('expecting a dict')
             self._check_dict(typ, object, t)
         elif atyp != typ:
-            raise t.reason('invalid type, expecting {}'.format(typ))
+            raise t.reason('invalid type, expecting {} and recieved {}'.format(typ, atyp))
