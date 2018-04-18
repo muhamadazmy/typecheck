@@ -246,3 +246,47 @@ class Checker:
             self._check_dict(typ, object, t)
         elif atyp != typ:
             raise t.reason('invalid type, expecting {} and recieved {}'.format(typ, atyp))
+
+
+
+
+def check(**kwargs):
+    """
+    check decorates functions, instance methods with arguments to quickly add your checks.
+    
+    e.g decorating functions
+
+    @check(n=int, s=str)
+    def myf(n, s):
+        return n, s 
+
+    e.g: decorating instance methods.
+    class Human:
+        @check(self=object, age=int)
+        def __init__(self, age):
+            self.age = age
+
+        @check(self=object, n=int) 
+        def get_older(self, n=1):
+            self.age += n
+    """
+
+
+    c = Checker(kwargs)
+    if 'self' in kwargs:
+        kwargs['self'] = Any()
+
+    def decorator(f):
+        def wrapper(*args, **funkwargs):
+            try: 
+                if funkwargs:
+                    c.check(funkwargs)
+                else:
+                    if args:
+                        c.check(dict(zip(f.__code__.co_varnames, args)))
+            except:
+                raise
+            else:
+                return f(*args, **funkwargs)
+        return wrapper
+    return decorator
